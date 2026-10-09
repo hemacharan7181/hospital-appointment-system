@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Find doctors and explore hospital appointment services.">
+  <title>MediCare | Hospital Appointment System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="navbar">
+    <a class="logo" href="#home">✚ MediCare</a>
+
+    <nav aria-label="Main navigation">
+      <a href="#home">Home</a>
+      <a href="#services">Services</a>
+      <a href="#doctors">Doctors</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <a class="nav-button" href="#doctors">Book Appointment</a>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="hero-content">
+        <span class="eyebrow">YOUR HEALTH, OUR PRIORITY</span>
+        <h1>Better Care.<br>Better <span>Health.</span></h1>
+        <p>
+          Find the right doctor and take the first step
+          towards better healthcare. Simple, convenient,
+          and designed around you.
+        </p>
+        <div class="hero-actions">
+          <a class="primary-button" href="#doctors">
+            Find a Doctor →
+          </a>
+          <a class="secondary-button" href="#services">
+            Explore Services
+          </a>
+        </div>
+
+        <div class="trust-row">
+          <div><strong>Easy</strong><small>Appointment access</small></div>
+          <div><strong>Trusted</strong><small>Healthcare information</small></div>
+          <div><strong>24/7</strong><small>Website access</small></div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="medical-icon">✚</div>
+        <div class="floating-card">
+          <span class="status-dot"></span>
+          Your health journey starts here
+        </div>
+        <div class="hero-caption">
+          <span>MEDICARE HEALTHCARE</span>
+          <strong>Care that puts you first.</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="services">
+      <div class="section-heading">
+        <span class="eyebrow">WHAT WE OFFER</span>
+        <h2>Healthcare made simpler</h2>
+        <p>Explore services designed to make accessing care easier.</p>
+      </div>
+
+      <div class="service-grid">
+        <article class="service-card">
+          <span class="service-icon">🩺</span>
+          <h3>Doctor Consultation</h3>
+          <p>Explore doctor profiles and medical specialties.</p>
+        </article>
+        <article class="service-card">
+          <span class="service-icon">📅</span>
+          <h3>Easy Appointments</h3>
+          <p>Choose a doctor and proceed to appointment booking.</p>
+        </article>
+        <article class="service-card">
+          <span class="service-icon">🤖</span>
+          <h3>AI Health Assistant</h3>
+          <p>Get general health information from our planned AI assistant.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section doctors-section" id="doctors">
+      <div class="section-heading">
+        <span class="eyebrow">MEET OUR DOCTORS</span>
+        <h2>Find the right specialist</h2>
+        <p>Explore our sample doctor profiles. Booking functionality comes next.</p>
+      </div>
+
+      <div class="doctor-grid">
+        <article class="doctor-card">
+          <div class="doctor-avatar avatar-one">👨‍⚕️</div>
+          <h3>Dr. Arjun Mehta</h3>
+          <p>General Physician</p>
+          <span class="availability">● Sample profile</span>
+          <button class="doctor-button" data-doctor="Dr. Arjun Mehta">
+            Book Appointment
+          </button>
+        </article>
+
+        <article class="doctor-card">
+          <div class="doctor-avatar avatar-two">👩‍⚕️</div>
+          <h3>Dr. Priya Sharma</h3>
+          <p>Cardiology</p>
+          <span class="availability">● Sample profile</span>
+          <button class="doctor-button" data-doctor="Dr. Priya Sharma">
+            Book Appointment
+          </button>
+        </article>
+
+        <article class="doctor-card">
+          <div class="doctor-avatar avatar-three">👨‍⚕️</div>
+          <h3>Dr. Rahul Patel</h3>
+          <p>Dermatology</p>
+          <span class="availability">● Sample profile</span>
+          <button class="doctor-button" data-doctor="Dr. Rahul Patel">
+            Book Appointment
+          </button>
+        </article>
+      </div>
+    </section>
+
+    <section class="contact-banner" id="contact">
+      <div>
+        <span class="eyebrow">LET'S GET STARTED</span>
+        <h2>Your next step towards better health.</h2>
+        <p>Explore our sample doctors and appointment services.</p>
+      </div>
+      <a class="primary-button" href="#doctors">Find a Doctor →</a>
+    </section>
+  </main>
+
+  <footer>
+    <a class="logo" href="#home">✚ MediCare</a>
+    <p>Educational prototype · Sample doctor information only</p>
+    <p>© <span id="year"></span> MediCare</p>
+  </footer>
+</body>
+</html>
