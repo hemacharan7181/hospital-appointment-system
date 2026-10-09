@@ -5,10 +5,18 @@ const modal = $("#bookingModal");
 const form = $("#bookingForm");
 const doctorSelect = $("#doctorSelect");
 const dateInput = $("#appointmentDate");
+const timeSelect = $("#appointmentTime");
 const message = $("#bookingMessage");
 const appointmentList = $("#appointmentList");
 
 const STORAGE_KEY = "medicare_demo_appointments";
+
+// Preserve the time slots defined in index.html.
+const originalTimeOptions = Array.from(timeSelect.options).map((option) => ({
+  value: option.value,
+  text: option.textContent,
+  disabled: option.disabled
+}));
 
 function getAppointments() {
   try {
@@ -23,20 +31,90 @@ function saveAppointments(appointments) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
 }
 
+function getLocalDate() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+// Refresh available slots for the selected doctor and date.
+function refreshAvailableSlots() {
+  const doctor = doctorSelect.value;
+  const date = dateInput.value;
+  const previousTime = timeSelect.value;
+
+  timeSelect.replaceChildren();
+
+  const placeholder = originalTimeOptions.find(
+    (option) => option.value === ""
+  );
+
+  if (placeholder) {
+    timeSelect.add(new Option(placeholder.text, ""));
+  } else {
+    timeSelect.add(new Option("Select a time", ""));
+  }
+
+  // Until a doctor and date are selected, show the normal slot list.
+  if (!doctor || !date) {
+    originalTimeOptions
+      .filter((option) => option.value !== "")
+      .forEach((option) => {
+        const newOption = new Option(option.text, option.value);
+        newOption.disabled = option.disabled;
+        timeSelect.add(newOption);
+      });
+
+    return;
+  }
+
+  const bookedTimes = new Set(
+    getAppointments()
+      .filter(
+        (appointment) =>
+          appointment.doctor === doctor &&
+          appointment.date === date
+      )
+      .map((appointment) => appointment.time)
+  );
+
+  const availableOptions = originalTimeOptions.filter(
+    (option) =>
+      option.value !== "" &&
+      !bookedTimes.has(option.value) &&
+      !option.disabled
+  );
+
+  availableOptions.forEach((option) => {
+    timeSelect.add(new Option(option.text, option.value));
+  });
+
+  if (availableOptions.length === 0) {
+    timeSelect.add(
+      new Option("No slots available — choose another date", "")
+    );
+    message.textContent = "No time slots remain for this doctor on this date.";
+    return;
+  }
+
+  // Keep the previous selection only if it remains available.
+  if (availableOptions.some((option) => option.value === previousTime)) {
+    timeSelect.value = previousTime;
+  }
+}
 
 function openBooking(doctor = "") {
   form.reset();
   message.textContent = "";
   doctorSelect.value = doctor;
 
-  const now = new Date();
-  const year = now.getFullYear()
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-
-  // HTML date inputs require YYYY-MM-DD.
-  dateInput.min = `${year}-${month}-${day}`;
+  dateInput.min = getLocalDate();
   dateInput.value = "";
+
+  refreshAvailableSlots();
 
   modal.hidden = false;
   $("#patientName").focus();
@@ -54,7 +132,7 @@ document.querySelectorAll(".doctor-button").forEach((button) => {
 
 document.querySelectorAll('a[href="#doctors"]').forEach((link) => {
   link.addEventListener("click", () => {
-    // The navigation link still scrolls to the doctor section.
+    // Keep the normal navigation behavior.
   });
 });
 
@@ -66,6 +144,13 @@ modal.addEventListener("click", (event) => {
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && !modal.hidden) closeBooking();
+});
+
+// Update slots whenever the doctor or appointment date changes.
+doctorSelect.addEventListener("change", refreshAvailableSlots);
+dateInput.addEventListener("change", () => {
+  message.textContent = "";
+  refreshAvailableSlots();
 });
 
 function renderAppointments() {
@@ -87,8 +172,7 @@ function renderAppointments() {
     title.textContent = appointment.doctor;
 
     const details = document.createElement("p");
-    details.textContent =
-      `${appointment.date} at ${appointment.time}`;
+    details.textContent = `${appointment.date} at ${appointment.time}`;
 
     const status = document.createElement("p");
     status.textContent = `Patient: ${appointment.name}`;
@@ -102,8 +186,10 @@ function renderAppointments() {
       const updated = getAppointments().filter(
         (item) => item.id !== appointment.id
       );
+
       saveAppointments(updated);
       renderAppointments();
+      refreshAvailableSlots();
     });
 
     card.append(title, details, status, cancel);
@@ -120,37 +206,32 @@ form.addEventListener("submit", (event) => {
   const phone = $("#patientPhone").value.trim();
   const doctor = doctorSelect.value;
   const date = dateInput.value;
-  const time = $("#appointmentTime").value;
+  const time = timeSelect.value;
 
   if (!name || !phone || !doctor || !date || !time) {
     message.textContent = "Please complete all fields.";
     return;
   }
 
-  // Compare date strings in YYYY-MM-DD format.
-  const today = new Date();
-  const localToday = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0")
-  ].join("-");
-
-  if (date < localToday) {
+  if (date < getLocalDate()) {
     message.textContent = "Please select today or a future date.";
     return;
   }
 
   const appointments = getAppointments();
 
-  const alreadyBooked = appointments.some((item) =>
-    item.doctor === doctor &&
-    item.date === date &&
-    item.time === time
+  // Check again during submission to prevent duplicate demo bookings.
+  const alreadyBooked = appointments.some(
+    (item) =>
+      item.doctor === doctor &&
+      item.date === date &&
+      item.time === time
   );
 
   if (alreadyBooked) {
     message.textContent =
-      "That doctor already has a demo booking for this slot. Choose another time.";
+      "That time slot was just booked. Please choose another time.";
+    refreshAvailableSlots();
     return;
   }
 
