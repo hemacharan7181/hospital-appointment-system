@@ -136,6 +136,72 @@
       </div>
       <a class="primary-button" href="#doctors">Find a Doctor →</a>
     </section>
+    
+<!-- Appointment Booking Modal -->
+<div class="modal" id="bookingModal" hidden>
+  <div class="modal-content" role="dialog"
+       aria-modal="true" aria-labelledby="bookingTitle">
+
+    <button type="button" class="modal-close"
+            id="closeBooking" aria-label="Close">&times;</button>
+
+    <span class="eyebrow">MEDICARE HEALTHCARE</span>
+    <h2 id="bookingTitle">Book an Appointment</h2>
+    <p>Enter your details to request an appointment.</p>
+
+    <form id="bookingForm">
+      <label for="patientName">Patient Name</label>
+      <input id="patientName" name="patientName"
+             type="text" required maxlength="80"
+             autocomplete="name" placeholder="Enter your full name">
+
+      <label for="patientPhone">Phone Number</label>
+      <input id="patientPhone" name="patientPhone"
+             type="tel" required
+             pattern="[0-9+() -]{8,20}"
+             autocomplete="tel" placeholder="Enter phone number">
+
+      <label for="doctorSelect">Choose Doctor</label>
+      <select id="doctorSelect" name="doctor" required>
+        <option value="">Select a doctor</option>
+        <option>Dr. Arjun Mehta</option>
+        <option>Dr. Priya Sharma</option>
+        <option>Dr. Rahul Patel</option>
+      </select>
+
+      <label for="appointmentDate">Appointment Date</label>
+      <input id="appointmentDate" name="date"
+             type="date" required>
+
+      <label for="appointmentTime">Appointment Time</label>
+      <select id="appointmentTime" name="time" required>
+        <option value="">Select a time</option>
+        <option>09:00 AM</option>
+        <option>10:00 AM</option>
+        <option>11:00 AM</option>
+        <option>02:00 PM</option>
+        <option>03:00 PM</option>
+        <option>04:00 PM</option>
+      </select>
+
+      <button type="submit" class="primary-button booking-submit">
+        Confirm Appointment
+      </button>
+      <p id="bookingMessage" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Appointment List -->
+<section class="section" id="myAppointments">
+  <div class="section-heading">
+    <span class="eyebrow">YOUR BOOKINGS</span>
+    <h2>My Appointments</h2>
+    <p>View or cancel your saved demo appointments.</p>
+  </div>
+  <div id="appointmentList" class="appointment-list"></div>
+</section>
+
   </main>
 
   <footer>
