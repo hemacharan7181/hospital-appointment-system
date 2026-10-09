@@ -23,13 +23,20 @@ function saveAppointments(appointments) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(appointments));
 }
 
+
 function openBooking(doctor = "") {
   form.reset();
   message.textContent = "";
   doctorSelect.value = doctor;
 
-  // Do not allow booking a past date.
-  dateInput.min = new Date().toLocaleDateString("en-CA");
+  const now = new Date();
+  const year = now.getFullYear()
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  // HTML date inputs require YYYY-MM-DD.
+  dateInput.min = `${year}-${month}-${day}`;
+  dateInput.value = "";
 
   modal.hidden = false;
   $("#patientName").focus();
