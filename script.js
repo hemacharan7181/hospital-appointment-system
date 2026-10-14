@@ -292,6 +292,10 @@ aiChatForm.addEventListener("submit", async (event) => {
   aiChatInput.disabled = true;
 
   try {
+    if (API_BASE_URL.includes("REPLACE-WITH-RENDER-URL")) {
+      throw new Error("No remote AI service configured.");
+    }
+
     const response = await fetch(`${API_BASE_URL}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
