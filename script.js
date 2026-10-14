@@ -241,9 +241,12 @@ function getOfflineAssistantReply(question) {
   if (
     normalizedQuestion.includes("skin") ||
     normalizedQuestion.includes("hair") ||
-    normalizedQuestion.includes("rash")
+    normalizedQuestion.includes("rash") ||
+    normalizedQuestion.includes("ringworm") ||
+    normalizedQuestion.includes("fungal") ||
+    normalizedQuestion.includes("itch")
   ) {
-    return "For skin, hair or rash concerns, choose Dermatology with Dr. Rahul Patel. Please click Book Appointment to see the available time slots.";
+    return "For ringworm or other skin concerns, consult Dermatology with Dr. Rahul Patel. I cannot diagnose or prescribe; please click Book Appointment to see the available time slots.";
   }
 
   if (
@@ -317,7 +320,14 @@ aiChatForm.addEventListener("submit", async (event) => {
     thinkingBubble.textContent = reply;
     aiChatHistory.push({ role: "assistant", text: reply });
   } catch {
-    const offlineReply = getOfflineAssistantReply(chatMessage);
+    const recentUserMessages = aiChatHistory
+      .filter((item) => item.role === "user")
+      .slice(-6)
+      .map((item) => item.text)
+      .join(" ");
+    const offlineReply = getOfflineAssistantReply(
+      `${recentUserMessages} ${chatMessage}`
+    );
     thinkingBubble.textContent = offlineReply;
     aiChatHistory.push({ role: "assistant", text: offlineReply });
   } finally {
