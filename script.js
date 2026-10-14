@@ -1,4 +1,6 @@
 
+const API_BASE_URL = (location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:") ? "http://localhost:3000" : "https://REPLACE-WITH-RENDER-URL.onrender.com";
+
 const $ = (selector) => document.querySelector(selector);
 
 const modal = $("#bookingModal");
@@ -196,6 +198,82 @@ function renderAppointments() {
     appointmentList.appendChild(card);
   });
 }
+
+const aiChatToggle = $("#aiChatToggle");
+const aiChatPanel = $("#aiChatPanel");
+const aiChatClose = $("#aiChatClose");
+const aiChatMessages = $("#aiChatMessages");
+const aiChatForm = $("#aiChatForm");
+const aiChatInput = $("#aiChatInput");
+const aiChatSend = aiChatForm.querySelector("button[type='submit']");
+const aiChatHistory = [];
+
+function addAiChatBubble(text, role) {
+  const bubble = document.createElement("div");
+  bubble.className = `ai-chat-bubble ai-chat-${role === "user" ? "user" : "bot"}`;
+  bubble.textContent = text;
+  bubble.dataset.role = role;
+  aiChatMessages.appendChild(bubble);
+  aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+  return bubble;
+}
+
+aiChatToggle.addEventListener("click", () => {
+  aiChatPanel.hidden = false;
+  aiChatInput.focus();
+});
+
+aiChatClose.addEventListener("click", () => {
+  aiChatPanel.hidden = true;
+});
+
+aiChatForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const chatMessage = aiChatInput.value.trim();
+  if (!chatMessage || aiChatSend.disabled) return;
+
+  aiChatInput.value = "";
+  addAiChatBubble(chatMessage, "user");
+  const history = aiChatHistory.slice(-6);
+  aiChatHistory.push({ role: "user", text: chatMessage });
+  const thinkingBubble = addAiChatBubble("Thinking...", "bot");
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+  aiChatSend.disabled = true;
+  aiChatInput.disabled = true;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: chatMessage,
+        history
+      }),
+      signal: controller.signal
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || "The assistant could not respond.");
+    }
+
+    const reply = typeof data.reply === "string" && data.reply.trim()
+      ? data.reply.trim()
+      : "The assistant is busy, please try again in a moment.";
+    thinkingBubble.textContent = reply;
+    aiChatHistory.push({ role: "assistant", text: reply });
+  } catch {
+    thinkingBubble.textContent =
+      "The assistant is busy, please try again in a moment.";
+  } finally {
+    clearTimeout(timeoutId);
+    aiChatSend.disabled = false;
+    aiChatInput.disabled = false;
+    aiChatInput.focus();
+  }
+});
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
