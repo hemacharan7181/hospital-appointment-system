@@ -220,85 +220,52 @@ function addAiChatBubble(text, role) {
 
 function getOfflineAssistantReply(question) {
   const normalizedQuestion = question.toLowerCase();
+  const hasAny = (...terms) =>
+    terms.some((term) => normalizedQuestion.includes(term));
 
   if (/^(hi|hello|hey|helo|good morning|good afternoon|good evening)[!. ]*$/.test(normalizedQuestion)) {
     return "Hello! I can help you choose the right MediCare department and doctor. Tell me what symptoms or health concern you have; I cannot diagnose or prescribe.";
   }
 
-  if (
-    normalizedQuestion.includes("emergency") ||
-    normalizedQuestion.includes("can't breathe") ||
-    normalizedQuestion.includes("cannot breathe") ||
-    normalizedQuestion.includes("chest pain") ||
-    normalizedQuestion.includes("unconscious") ||
-    normalizedQuestion.includes("severe bleeding")
-  ) {
-    return "For a medical emergency, contact local emergency services immediately. This assistant cannot diagnose or treat emergencies.";
+  if (hasAny("emergency", "can't breathe", "cannot breathe", "chest pain", "unconscious", "severe bleeding", "stroke", "seizure", "overdose", "suicid", "kill myself")) {
+    return "What you described may need urgent medical attention. Contact local emergency services now or go to the nearest emergency department; this assistant cannot diagnose or treat emergencies.";
   }
 
-  if (
-    normalizedQuestion.includes("cardio") ||
-    normalizedQuestion.includes("heart") ||
-    normalizedQuestion.includes("blood pressure")
-  ) {
-    return "For heart, chest or blood-pressure concerns, choose Cardiology with Dr. Priya Sharma. Please click Book Appointment to see the available time slots.";
+  if (hasAny("cardio", "heart", "blood pressure", "palpitation", "irregular heartbeat")) {
+    return "Heart, chest or blood-pressure concerns are best started with Cardiology and Dr. Priya Sharma. I cannot diagnose or prescribe, but you can click Book Appointment to see the available time slots.";
   }
 
-  if (
-    normalizedQuestion.includes("skin") ||
-    normalizedQuestion.includes("hair") ||
-    normalizedQuestion.includes("rash") ||
-    normalizedQuestion.includes("ringworm") ||
-    normalizedQuestion.includes("scabies") ||
-    normalizedQuestion.includes("scabie") ||
-    normalizedQuestion.includes("scab") ||
-    normalizedQuestion.includes("fungal") ||
-    normalizedQuestion.includes("itch") ||
-    normalizedQuestion.includes("acne") ||
-    normalizedQuestion.includes("eczema") ||
-    normalizedQuestion.includes("psoriasis") ||
-    normalizedQuestion.includes("boil")
-  ) {
+  if (hasAny("skin", "hair", "rash", "ringworm", "scabies", "scabie", "fungal", "itch", "acne", "eczema", "psoriasis", "boil")) {
     if (normalizedQuestion.includes("scab") && !normalizedQuestion.includes("scabies")) {
       return "A scab is a crust that can form while a wound heals; it is different from scabies. If the area is painful, spreading, infected-looking or not healing, consult Dermatology with Dr. Rahul Patel. I cannot diagnose or prescribe.";
     }
     if (normalizedQuestion.includes("scabies") || normalizedQuestion.includes("scabie")) {
       return "Scabies is a contagious skin condition commonly associated with intense itching and a rash, but this assistant cannot confirm a diagnosis. Consult Dermatology with Dr. Rahul Patel and avoid close skin contact until you receive professional advice.";
     }
-    return "Your concern sounds related to the skin, so consult Dermatology with Dr. Rahul Patel. I cannot diagnose or prescribe; please click Book Appointment to see the available time slots.";
+    return "Your concern sounds related to the skin, hair or nails, so Dermatology with Dr. Rahul Patel is the best starting point. I cannot diagnose or prescribe; click Book Appointment to see the available time slots.";
   }
 
-  if (
-    normalizedQuestion.includes("fever") ||
-    normalizedQuestion.includes("cold") ||
-    normalizedQuestion.includes("stomach") ||
-    normalizedQuestion.includes("vomit") ||
-    normalizedQuestion.includes("diarr") ||
-    normalizedQuestion.includes("headache") ||
-    normalizedQuestion.includes("sore throat") ||
-    normalizedQuestion.includes("general physician")
-  ) {
-    return "For fever, cold, stomach or other general health concerns, consult General Physician Dr. Arjun Mehta. I cannot diagnose or prescribe; please click Book Appointment to see the available time slots.";
+  if (hasAny("fever", "cold", "flu", "cough", "breathless", "stomach", "vomit", "diarr", "constipation", "nausea", "headache", "migraine", "sore throat", "back pain", "joint pain", "body pain", "fatigue", "dizzy", "diabetes", "thyroid", "urine", "urinary", "period", "menstrual", "pregnan", "general physician")) {
+    return "For this general or ongoing health concern, General Physician Dr. Arjun Mehta is the best first consultation. I cannot diagnose or prescribe; describe the symptoms to the doctor and click Book Appointment to see available time slots.";
   }
 
-  if (
-    normalizedQuestion.includes("who should") ||
-    normalizedQuestion.includes("which doctor") ||
-    normalizedQuestion.includes("whom should") ||
-    normalizedQuestion.includes("consult")
-  ) {
+  if (hasAny("eye", "vision", "ear", "hearing", "tooth", "teeth", "dental", "anxiety", "depress", "sleep")) {
+    return "MediCare does not list a separate specialist for that concern, so start with General Physician Dr. Arjun Mehta. They can assess you and guide you to further care; I cannot diagnose or prescribe.";
+  }
+
+  if (hasAny("what should i do", "help me", "symptom", "problem", "pain", "hurt", "swollen", "swelling")) {
+    return "Tell me where the problem is, how long it has been present, and whether it is getting worse. I cannot diagnose or prescribe, but General Physician Dr. Arjun Mehta is the best first consultation for symptoms not clearly linked to Cardiology or Dermatology.";
+  }
+
+  if (hasAny("who should", "which doctor", "whom should", "consult")) {
     return "Please describe your main symptom or concern so I can guide you to the closest MediCare department. I cannot diagnose or prescribe.";
   }
 
-  if (
-    normalizedQuestion.includes("book") ||
-    normalizedQuestion.includes("appointment") ||
-    normalizedQuestion.includes("doctor")
-  ) {
-    return "You can book with Dr. Arjun Mehta, Dr. Priya Sharma or Dr. Rahul Patel. Please click Book Appointment to see the available time slots.";
+  if (hasAny("book", "appointment", "doctor")) {
+    return "You can book with Dr. Arjun Mehta, Dr. Priya Sharma or Dr. Rahul Patel. Tell me your main concern if you want help choosing a department, then click Book Appointment to see available time slots.";
   }
 
-  return "I can help with MediCare departments, doctors and appointment booking. Please click Book Appointment to see the available time slots.";
+  return "I can help you choose among General Physician, Cardiology and Dermatology. What symptom or health concern are you experiencing? I will not diagnose or prescribe.";
 }
 
 aiChatToggle.addEventListener("click", () => {
