@@ -218,6 +218,54 @@ function addAiChatBubble(text, role) {
   return bubble;
 }
 
+function getOfflineAssistantReply(question) {
+  const normalizedQuestion = question.toLowerCase();
+
+  if (
+    normalizedQuestion.includes("emergency") ||
+    normalizedQuestion.includes("can't breathe") ||
+    normalizedQuestion.includes("cannot breathe") ||
+    normalizedQuestion.includes("chest pain")
+  ) {
+    return "For a medical emergency, contact local emergency services immediately. This assistant cannot diagnose or treat emergencies.";
+  }
+
+  if (
+    normalizedQuestion.includes("cardio") ||
+    normalizedQuestion.includes("heart") ||
+    normalizedQuestion.includes("blood pressure")
+  ) {
+    return "For heart, chest or blood-pressure concerns, choose Cardiology with Dr. Priya Sharma. Please click Book Appointment to see the available time slots.";
+  }
+
+  if (
+    normalizedQuestion.includes("skin") ||
+    normalizedQuestion.includes("hair") ||
+    normalizedQuestion.includes("rash")
+  ) {
+    return "For skin, hair or rash concerns, choose Dermatology with Dr. Rahul Patel. Please click Book Appointment to see the available time slots.";
+  }
+
+  if (
+    normalizedQuestion.includes("fever") ||
+    normalizedQuestion.includes("cold") ||
+    normalizedQuestion.includes("stomach") ||
+    normalizedQuestion.includes("general physician")
+  ) {
+    return "For fever, cold, stomach or unclear concerns, choose General Physician Dr. Arjun Mehta. Please click Book Appointment to see the available time slots.";
+  }
+
+  if (
+    normalizedQuestion.includes("book") ||
+    normalizedQuestion.includes("appointment") ||
+    normalizedQuestion.includes("doctor")
+  ) {
+    return "You can book with Dr. Arjun Mehta, Dr. Priya Sharma or Dr. Rahul Patel. Please click Book Appointment to see the available time slots.";
+  }
+
+  return "I can help with MediCare departments, doctors and appointment booking. Please click Book Appointment to see the available time slots.";
+}
+
 aiChatToggle.addEventListener("click", () => {
   aiChatPanel.hidden = false;
   aiChatInput.focus();
@@ -265,8 +313,9 @@ aiChatForm.addEventListener("submit", async (event) => {
     thinkingBubble.textContent = reply;
     aiChatHistory.push({ role: "assistant", text: reply });
   } catch {
-    thinkingBubble.textContent =
-      "The assistant is busy, please try again in a moment.";
+    const offlineReply = getOfflineAssistantReply(chatMessage);
+    thinkingBubble.textContent = offlineReply;
+    aiChatHistory.push({ role: "assistant", text: offlineReply });
   } finally {
     clearTimeout(timeoutId);
     aiChatSend.disabled = false;
