@@ -221,11 +221,17 @@ function addAiChatBubble(text, role) {
 function getOfflineAssistantReply(question) {
   const normalizedQuestion = question.toLowerCase();
 
+  if (/^(hi|hello|hey|helo|good morning|good afternoon|good evening)[!. ]*$/.test(normalizedQuestion)) {
+    return "Hello! I can help you choose the right MediCare department and doctor. Tell me what symptoms or health concern you have; I cannot diagnose or prescribe.";
+  }
+
   if (
     normalizedQuestion.includes("emergency") ||
     normalizedQuestion.includes("can't breathe") ||
     normalizedQuestion.includes("cannot breathe") ||
-    normalizedQuestion.includes("chest pain")
+    normalizedQuestion.includes("chest pain") ||
+    normalizedQuestion.includes("unconscious") ||
+    normalizedQuestion.includes("severe bleeding")
   ) {
     return "For a medical emergency, contact local emergency services immediately. This assistant cannot diagnose or treat emergencies.";
   }
@@ -243,19 +249,45 @@ function getOfflineAssistantReply(question) {
     normalizedQuestion.includes("hair") ||
     normalizedQuestion.includes("rash") ||
     normalizedQuestion.includes("ringworm") ||
+    normalizedQuestion.includes("scabies") ||
+    normalizedQuestion.includes("scabie") ||
+    normalizedQuestion.includes("scab") ||
     normalizedQuestion.includes("fungal") ||
-    normalizedQuestion.includes("itch")
+    normalizedQuestion.includes("itch") ||
+    normalizedQuestion.includes("acne") ||
+    normalizedQuestion.includes("eczema") ||
+    normalizedQuestion.includes("psoriasis") ||
+    normalizedQuestion.includes("boil")
   ) {
-    return "For ringworm or other skin concerns, consult Dermatology with Dr. Rahul Patel. I cannot diagnose or prescribe; please click Book Appointment to see the available time slots.";
+    if (normalizedQuestion.includes("scab") && !normalizedQuestion.includes("scabies")) {
+      return "A scab is a crust that can form while a wound heals; it is different from scabies. If the area is painful, spreading, infected-looking or not healing, consult Dermatology with Dr. Rahul Patel. I cannot diagnose or prescribe.";
+    }
+    if (normalizedQuestion.includes("scabies") || normalizedQuestion.includes("scabie")) {
+      return "Scabies is a contagious skin condition commonly associated with intense itching and a rash, but this assistant cannot confirm a diagnosis. Consult Dermatology with Dr. Rahul Patel and avoid close skin contact until you receive professional advice.";
+    }
+    return "Your concern sounds related to the skin, so consult Dermatology with Dr. Rahul Patel. I cannot diagnose or prescribe; please click Book Appointment to see the available time slots.";
   }
 
   if (
     normalizedQuestion.includes("fever") ||
     normalizedQuestion.includes("cold") ||
     normalizedQuestion.includes("stomach") ||
+    normalizedQuestion.includes("vomit") ||
+    normalizedQuestion.includes("diarr") ||
+    normalizedQuestion.includes("headache") ||
+    normalizedQuestion.includes("sore throat") ||
     normalizedQuestion.includes("general physician")
   ) {
-    return "For fever, cold, stomach or unclear concerns, choose General Physician Dr. Arjun Mehta. Please click Book Appointment to see the available time slots.";
+    return "For fever, cold, stomach or other general health concerns, consult General Physician Dr. Arjun Mehta. I cannot diagnose or prescribe; please click Book Appointment to see the available time slots.";
+  }
+
+  if (
+    normalizedQuestion.includes("who should") ||
+    normalizedQuestion.includes("which doctor") ||
+    normalizedQuestion.includes("whom should") ||
+    normalizedQuestion.includes("consult")
+  ) {
+    return "Please describe your main symptom or concern so I can guide you to the closest MediCare department. I cannot diagnose or prescribe.";
   }
 
   if (
@@ -320,13 +352,19 @@ aiChatForm.addEventListener("submit", async (event) => {
     thinkingBubble.textContent = reply;
     aiChatHistory.push({ role: "assistant", text: reply });
   } catch {
-    const recentUserMessages = aiChatHistory
+    const normalizedChatMessage = chatMessage.toLowerCase();
+    const followUpQuestion =
+      normalizedChatMessage.includes("which doctor") ||
+      normalizedChatMessage.includes("whom") ||
+      normalizedChatMessage.includes("who should") ||
+      normalizedChatMessage.includes("consult");
+    const previousUserMessage = aiChatHistory
       .filter((item) => item.role === "user")
-      .slice(-6)
+      .slice(-2, -1)
       .map((item) => item.text)
       .join(" ");
     const offlineReply = getOfflineAssistantReply(
-      `${recentUserMessages} ${chatMessage}`
+      followUpQuestion ? `${previousUserMessage} ${chatMessage}` : chatMessage
     );
     thinkingBubble.textContent = offlineReply;
     aiChatHistory.push({ role: "assistant", text: offlineReply });
